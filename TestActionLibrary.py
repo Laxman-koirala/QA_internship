@@ -12,6 +12,12 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 
 class A:
+   global Age
+   global First_name
+   global LastName
+   global ContactNo
+
+
 
    def openBrowser(self):
       options = Options()
@@ -111,6 +117,7 @@ class A:
 
       #random age,contactno
       Age = randint(4, 109)
+      global ContactNo
       ContactNo = randint(9841111111, 9849999999)
       self.danpheEMR.find_element_by_css_selector(".row > .form-control").send_keys(Age)
       self.danpheEMR.find_element_by_css_selector(".rad-holder > .mt-radio:nth-child(1) > span").click()
@@ -123,7 +130,7 @@ class A:
       # Random listed Membership
       possible_membership = self.danpheEMR.find_element_by_css_selector("membership-select > div > div > div > div > select")
       drp = Select(possible_membership)
-      index_number = randint(1, len(drp.options))
+      index_number = randint(1, len(drp.options)-1)
       drp.select_by_index(index_number)
       time.sleep(2)
       self.danpheEMR.find_element_by_xpath("//div[2]/div[2]/input").send_keys("Auto discount check")
@@ -132,7 +139,7 @@ class A:
       #random listed reason
       possible_reason = self.danpheEMR.find_element_by_css_selector("div:nth-child(3) > div > select")
       drp = Select(possible_reason)
-      index_number = randint(0,len(drp.options))
+      index_number = randint(0,len(drp.options)-1)
       drp.select_by_index(index_number)
 
       #random gender, select radio botton
@@ -145,7 +152,7 @@ class A:
       #random_possible listed payment type
       possible_reason = self.danpheEMR.find_element_by_css_selector("#pay_mode")
       drp = Select(possible_reason)
-      index_number = randint(0, len(drp.options))
+      index_number = randint(0, len(drp.options)-1)
       drp.select_by_index(index_number)
       paymentMode =str(self.danpheEMR.find_element_by_css_selector("#pay_mode").text)
 
@@ -157,20 +164,50 @@ class A:
       if paymentMode =='CREDIT':
          self.danpheEMR.find_element_by_css_selector(' tr:nth-child(2) > td:nth-child(2) > textarea').send_keys("Credit under request of chairmain")
 
+         ##Random credit organization
+         possible_organization = self.danpheEMR.find_element_by_css_selector("#pay_mode")
+         drp = Select(possible_organization)
+         index_number = randint(1, len(drp.options)-1)
+         drp.select_by_index(index_number)
+
+
       self.danpheEMR.find_element_by_css_selector(".btn-success").click()
       time.sleep(5)
-      InvoiceNo = self.danpheEMR.find_element_by_xpath("//p[contains(text(), 'Invoice No:')]/child::span").text
-      print("InvoiceNoTemp", InvoiceNo)
-      InvoiceNo = InvoiceNo.partition("BL")[2]
-      print("InvoiceNo", InvoiceNo)
-      HospitalNo = self.danpheEMR.find_element_by_xpath(
-         "//strong[contains(text(), 'Hospital No:')]/parent::p/child::span/child::strong").text
-      print("HospitalNo:", HospitalNo)
-      print(" Verify OPD Invoice Details: END<<", "HospitalNo", HospitalNo, "InvoiceNo", InvoiceNo)
-
 
       print("Create New Appointment: END<<")
 
+
+
+
+   def verificationOfAppointmentInvoice(self):
+      global ContactNo
+      print(">>Verify of Appointment Invoice Details: START")
+      time.sleep(5)
+
+      #retriving text
+      Invoice_contactno = self.danpheEMR.find_element_by_xpath("//div[@id='printpage']/div/div[5]/div[5]/div/p").text
+      InvoiceNoTemp = self.danpheEMR.find_element_by_xpath("//p[contains(text(), 'Invoice No:')]/child::span").text
+      HospitalNo = self.danpheEMR.find_element_by_xpath(
+         "//strong[contains(text(), 'Hospital No:')]/parent::p/child::span/child::strong").text
+
+      Invoice_contactno = Invoice_contactno.partition("No: ")[2]
+      InvoiceNo = InvoiceNoTemp.partition("BL")[2]
+      recent_contact = []
+      recent_contact.append(ContactNo)
+
+      try:
+         assert int(recent_contact[-1]) == int(Invoice_contactno)
+      except:
+         print("Telephone number isn't coordinate/match || Additional bug")
+
+      finally:
+         print("InvoiceNoTemp: ", InvoiceNoTemp)
+         print("InvoiceNo: ", InvoiceNo)
+         print("HospitalNo: ", HospitalNo)
+         print(" Verify OPD Invoice Details: END<<", "HospitalNo", HospitalNo, "InvoiceNo", InvoiceNo)
+
+
+      print("Verification of Appointment Invoice Details: END<<")
 
 
 
