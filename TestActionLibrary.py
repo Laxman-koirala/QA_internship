@@ -12,10 +12,28 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 
 class A:
-   global Age
-   global First_name
-   global LastName
-   global ContactNo
+
+   def randomGenerator(self):
+
+      global First_name
+      global LastName
+      global Age
+      global ContactNo
+      global Doctor
+
+      First_name = names.get_first_name()
+      Age = randint(4, 109)
+      ContactNo = randint(9841111111, 9849999999)
+
+      #random last name
+      possible_lastName = ['Lamsal', 'Koirala', 'Bhatta', 'Pandey', 'Thapa']
+      LastName = possible_lastName[randint(0, len(possible_lastName) - 1)]
+
+      # Random Doctor selector
+      possible_doctor = ['Dr. ELVIS KSAWIER', 'Dr. DAANISH C LASZLO', 'Dr. JIMMIE Obet', 'Dr. ADYAAN Snopia',
+                         'Dr. EMRAN A MUJEEB']
+
+      Doctor = possible_doctor[randint(0, len(possible_doctor) - 1)]
 
 
 
@@ -88,9 +106,7 @@ class A:
       self.danpheEMR.find_element_by_css_selector("div>div>div>div>div:nth-child(1)>div>div>div>div>label>span").click()
       subtotal = int(self.danpheEMR.find_element_by_css_selector("div:nth-child(1) > div > span > b").text)
       if not subtotal:
-         possible_doctor = ['Dr. ELVIS KSAWIER', 'Dr. DAANISH C LASZLO', 'Dr. JIMMIE Obet', 'Dr. ADYAAN Snopia',
-                            'Dr. EMRAN A MUJEEB']
-         Doctor = possible_doctor[randint(0, len(possible_doctor) - 1)]
+
          self.danpheEMR.find_element_by_xpath("(//input[@onclick='this.select();'])[4]").clear()
          time.sleep(2)
          self.danpheEMR.find_element_by_xpath("(//input[@onclick='this.select();'])[4]").click()
@@ -102,23 +118,12 @@ class A:
 
 
      ## cheking with additional bill
-
-      #random first name
-      First_name =names.get_first_name()
       self.danpheEMR.find_element_by_id("aptPatFirstName").send_keys(First_name)
       self.danpheEMR.find_element_by_xpath("(//input[@type='text'])[2]").send_keys("test")
       time.sleep(2)
-
-      #random last_name
-      possible_lastName = ['Lamsal','Koirala','Bhatta','Pandey','Thapa']
-      LastName = possible_lastName[randint(0,len(possible_lastName)-1)]
       self.danpheEMR.find_element_by_css_selector(".col-md-3:nth-child(4) > .form-control").send_keys(LastName)
       time.sleep(1)
 
-      #random age,contactno
-      Age = randint(4, 109)
-      global ContactNo
-      ContactNo = randint(9841111111, 9849999999)
       self.danpheEMR.find_element_by_css_selector(".row > .form-control").send_keys(Age)
       self.danpheEMR.find_element_by_css_selector(".rad-holder > .mt-radio:nth-child(1) > span").click()
       self.danpheEMR.find_element_by_css_selector(".col-md-3 > .ng-invalid").click()
@@ -127,6 +132,7 @@ class A:
       time.sleep(2)
 
       ## checking with Membership discount
+
       # Random listed Membership
       possible_membership = self.danpheEMR.find_element_by_css_selector("membership-select > div > div > div > div > select")
       drp = Select(possible_membership)
@@ -149,6 +155,7 @@ class A:
       #print(status)
 
      ## payment mode checkup
+
       #random_possible listed payment type
       possible_reason = self.danpheEMR.find_element_by_css_selector("#pay_mode")
       drp = Select(possible_reason)
@@ -180,34 +187,92 @@ class A:
 
 
    def verificationOfAppointmentInvoice(self):
-      global ContactNo
       print(">>Verify of Appointment Invoice Details: START")
       time.sleep(5)
 
       #retriving text
-      Invoice_contactno = self.danpheEMR.find_element_by_xpath("//div[@id='printpage']/div/div[5]/div[5]/div/p").text
-      InvoiceNoTemp = self.danpheEMR.find_element_by_xpath("//p[contains(text(), 'Invoice No:')]/child::span").text
+      invoice_contactno = self.danpheEMR.find_element_by_xpath("//div[@id='printpage']/div/div[5]/div[5]/div/p").text
+      invoiceNoTemp = self.danpheEMR.find_element_by_xpath("//p[contains(text(), 'Invoice No:')]/child::span").text
       HospitalNo = self.danpheEMR.find_element_by_xpath(
          "//strong[contains(text(), 'Hospital No:')]/parent::p/child::span/child::strong").text
 
-      Invoice_contactno = Invoice_contactno.partition("No: ")[2]
-      InvoiceNo = InvoiceNoTemp.partition("BL")[2]
+      invoice_contactno = invoice_contactno.partition("No: ")[2]
+      invoiceNo = invoiceNoTemp.partition("BL")[2]
       recent_contact = []
       recent_contact.append(ContactNo)
 
       try:
-         assert int(recent_contact[-1]) == int(Invoice_contactno)
+         assert int(recent_contact[-1]) == int(invoice_contactno)
       except:
          print("Telephone number isn't coordinate/match || Additional bug")
 
       finally:
-         print("InvoiceNoTemp: ", InvoiceNoTemp)
-         print("InvoiceNo: ", InvoiceNo)
+         print("InvoiceNoTemp: ", invoiceNoTemp)
+         print("InvoiceNo: ", invoiceNo)
          print("HospitalNo: ", HospitalNo)
-         print(" Verify OPD Invoice Details: END<<", "HospitalNo", HospitalNo, "InvoiceNo", InvoiceNo)
+         print("Verification of Appointment Invoice Details: END||OPD<<")
 
 
-      print("Verification of Appointment Invoice Details: END<<")
+
+
+
+   def phoneBookReAppointment(self):
+      self.danpheEMR.find_element_by_link_text("Appointment").click()
+      time.sleep(2)
+
+      self.danpheEMR.find_element_by_css_selector("my-app>div>ul>li:nth-child(2)>a").click()
+      time.sleep(2)
+      self.danpheEMR.find_element_by_css_selector(".ag-row-first>div:nth-child(6)>a").click()
+      time.sleep(2)
+      self.danpheEMR.find_element_by_css_selector(".col-xs-12>div:nth-child(2)>div>div>input").clear()
+      time.sleep(2)
+      self.danpheEMR.find_element_by_css_selector(".col-xs-12>div:nth-child(2)>div>div>input").click()
+      time.sleep(2)
+      self.danpheEMR.find_element_by_css_selector(".col-xs-12>div:nth-child(2)>div>div>input").send_keys(Doctor)
+      time.sleep(2)
+      self.danpheEMR.find_element_by_css_selector(".col-xs-12>div:nth-child(2)>div>div>input").send_keys(Keys.TAB)
+      time.sleep(2)
+
+      self.danpheEMR.find_element_by_css_selector(".col-xs-12>div.btn-wrapper>input").click()
+
+   def listedVisitReAppointment(self):
+      self.danpheEMR.find_element_by_link_text("Appointment").click()
+      time.sleep(2)
+      self.danpheEMR.find_element_by_css_selector("my-app>div>ul>li:nth-child(4)>a").click()
+      time.sleep(2)
+      self.danpheEMR.find_element_by_css_selector(".ag-row-first>div:nth-child(6)>a").click()
+      time.sleep(2)
+
+      self.danpheEMR.find_element_by_css_selector("div:nth-child(1)>div>div>div:nth-child(1)>div:nth-child(2)>div>div>input").click()
+      time.sleep(2)
+      self.danpheEMR.find_element_by_css_selector("div:nth-child(1)>div>div>div:nth-child(1)>div:nth-child(2)>div>div>input").send_keys(Doctor)
+      time.sleep(2)
+      self.danpheEMR.find_element_by_css_selector("div:nth-child(1)>div>div>div:nth-child(1)>div:nth-child(2)>div>div>input").send_keys(Keys.TAB)
+      time.sleep(2)
+
+      self.danpheEMR.find_element_by_css_selector(".btn.blue.btn-success").click()
+
+   def followup(self):
+      self.danpheEMR.find_element_by_link_text("Appointment").click()
+      time.sleep(2)
+      self.danpheEMR.find_element_by_css_selector("my-app>div>ul>li:nth-child(3)>a").click()
+      time.sleep(2)
+      findme= self.danpheEMR.find_element_by_css_selector(".ag-paging-page-summary-panel>button:nth-child(5)")
+      time.sleep(1)
+
+      ## Scroll down the page till the selected element is visual
+      self.danpheEMR.execute_script("arguments[0].scrollIntoView();",findme)
+      self.danpheEMR.find_element_by_xpath("//*[@id='myGrid']/div/div[1]/div/div[3]/div[2]/div/div/div[20]/div[12]/span/a[1]").click()
+
+      time.sleep(2)
+      self.danpheEMR.find_element_by_css_selector("div.danphe-followup-visit>div:nth-child(2)>button").click()
+      time.sleep(2)
+      #Scroll down the page till the selected element is visual
+
+
+
+
+
 
 
 
