@@ -267,7 +267,133 @@ class A:
       time.sleep(2)
       self.danpheEMR.find_element_by_css_selector("div.danphe-followup-visit>div:nth-child(2)>button").click()
       time.sleep(2)
-      #Scroll down the page till the selected element is visual
+
+   def Transfer(self):
+
+      #back after registration
+      self.danpheEMR.find_element_by_css_selector("#billing-reciept>p>span>button").click()
+      time.sleep(2)
+      self.danpheEMR.find_element_by_css_selector("div.page-content-wrapper>div>div>my-app>div>ul>li:nth-child(3)>a").click()
+      time.sleep(2)
+      self.danpheEMR.find_element_by_xpath("//*[@id='myGrid']/div/div[1]/div/div[3]/div[2]/div/div/div[1]/div[12]/span/a[1]").click()
+      time.sleep(2)
+      self.danpheEMR.find_element_by_xpath("(//input[@onclick='this.select();'])[4]").clear()
+      time.sleep(2)
+      self.danpheEMR.find_element_by_xpath("(//input[@onclick='this.select();'])[4]").click()
+      time.sleep(2)
+      self.danpheEMR.find_element_by_xpath("(//input[@onclick='this.select();'])[4]").send_keys(Doctor)
+      time.sleep(2)
+      self.danpheEMR.find_element_by_xpath("(//input[@onclick='this.select();'])[4]").send_keys(Keys.TAB)
+      time.sleep(2)
+
+      # random listed reason
+      possible_reason = self.danpheEMR.find_element_by_css_selector("div:nth-child(3) > div > select")
+      drp = Select(possible_reason)
+      index_number = randint(0, len(drp.options) - 1)
+      drp.select_by_index(index_number)
+
+
+      ## payment mode checkup
+
+      # random_possible listed payment type
+      possible_reason = self.danpheEMR.find_element_by_css_selector("#pay_mode")
+      drp = Select(possible_reason)
+      index_number = randint(0, len(drp.options) - 1)
+      drp.select_by_index(index_number)
+      paymentMode = str(self.danpheEMR.find_element_by_css_selector("#pay_mode").text)
+
+      if paymentMode == 'Cheque' or paymentMode == 'Smart Card':
+         self.danpheEMR.find_element_by_css_selector(' tr:nth-child(2) > td:nth-child(2) > textarea').send_keys(
+            "Cheque/smartcard of NMB Bank")
+
+      if paymentMode == 'CREDIT':
+         self.danpheEMR.find_element_by_css_selector(' tr:nth-child(2) > td:nth-child(2) > textarea').send_keys(
+            "Credit under request of chairmain")
+
+         ##Random credit organization
+         possible_organization = self.danpheEMR.find_element_by_css_selector("#pay_mode")
+         drp = Select(possible_organization)
+         index_number = randint(1, len(drp.options) - 1)
+         drp.select_by_index(index_number)
+
+      self.danpheEMR.find_element_by_css_selector(".btn-success").click()
+      time.sleep(5)
+
+   def patientRegistration(self):
+
+      # Emergency contact
+      self.danpheEMR.find_element_by_link_text("Patient").click()
+      time.sleep(2)
+      self.danpheEMR.find_element_by_link_text("Register Patient").click()
+      time.sleep(2)
+      self.danpheEMR.find_element_by_css_selector("ng-component>div>ul>li:nth-child(5)>a").click()
+      time.sleep(2)
+      self.danpheEMR.find_element_by_css_selector("div.input-group>div>label:nth-child(3)>span").click()
+      time.sleep(2)
+      self.danpheEMR.find_element_by_css_selector("div.row.clearfix>div:nth-child(2)>div>input").send_keys(First_name)
+      self.danpheEMR.find_element_by_css_selector("div.row.clearfix>div:nth-child(3)>div>input").send_keys(LastName)
+      self.danpheEMR.find_element_by_css_selector("div.row.clearfix>div:nth-child(4)>div>input").send_keys(ContactNo)
+      self.danpheEMR.find_element_by_css_selector("div.row.clearfix>div:nth-child(5)>div>input").send_keys('Father')
+      self.danpheEMR.find_element_by_css_selector("div>div.col-md-12>div:nth-child(2)>input").click()
+      time.sleep(2)
+
+      # guarantor
+      self.danpheEMR.find_element_by_css_selector("ng-component>ng-component>div>ul>li:nth-child(3)>a").click()
+      time.sleep(2)
+      self.danpheEMR.find_element_by_css_selector("div:nth-child(1)>div:nth-child(1)>div:nth-child(2)>input").send_keys('Friend')
+      self.danpheEMR.find_element_by_css_selector("div:nth-child(1)>div:nth-child(2)>div>input").send_keys('Rajesh dai')
+      self.danpheEMR.find_element_by_css_selector(" div>div:nth-child(1)>div:nth-child(6)>input").click()
+      time.sleep(2)
+
+      # Address
+      self.danpheEMR.find_element_by_css_selector("ng-component>ng-component>div>ul>li:nth-child(2)>a").click()
+      time.sleep(2)
+      self.danpheEMR.find_element_by_css_selector("div.row.clearfix>div:nth-child(2)>div>input").send_keys('Bhoisi Tol')
+      self.danpheEMR.find_element_by_css_selector("div.row.clearfix>div:nth-child(6)>div>input").send_keys('New Road')
+      self.danpheEMR.find_element_by_css_selector("div:nth-child(1)>form>div>div>div:nth-child(2)>input").click()
+      time.sleep(2)
+
+      #Basic information
+      self.danpheEMR.find_element_by_css_selector("ng-component>ng-component>div>ul>li:nth-child(1)>a").click()
+      self.danpheEMR.find_element_by_id("regPatFirstName").send_keys(First_name)
+      self.danpheEMR.find_element_by_xpath("(//input[@value=''])[3]").send_keys(LastName)
+      self.danpheEMR.find_element_by_xpath("//input[@type='number']").send_keys(Age)
+      self.danpheEMR.find_element_by_xpath("//input[@type='tel']").send_keys(ContactNo)
+      time.sleep(2)
+      self.danpheEMR.find_element_by_xpath("//div[2]/div/div/div/div/label/span").click()
+      time.sleep(2)
+      self.danpheEMR.find_element_by_xpath("//input[@value='Register Patient']").click()
+
+   def PatientSearchEditAndViewHistory(self):
+
+      #searching by phone number
+      time.sleep(5)
+      self.danpheEMR.find_element_by_id("quickFilterInput").send_keys(ContactNo)
+      time.sleep(2)
+      assert str(ContactNo) == self.danpheEMR.find_element_by_xpath("//ag-grid-angular[@id='myGrid']"
+                                                                    "/div/div/div/div[3]/div[2]/div/div/div/div[5]").text
+      global HospitalNo
+      HospitalNo = self.danpheEMR.find_element_by_xpath("//ag-grid-angular[@id='myGrid']"
+                                                        "/div/div/div/div[3]/div[2]/div/div/div/div").text
+      print(HospitalNo)
+
+      # start editing
+      self.danpheEMR.find_element_by_xpath("//*[@id='myGrid']/div/div[1]/div/div[3]"
+                                           "/div[2]/div/div/div[1]/div[6]/a[1]").click()
+      time.sleep(2)
+      self.danpheEMR.find_element_by_css_selector("#regPatFirstName").clear()
+      self.danpheEMR.find_element_by_css_selector("#regPatFirstName").send_keys(names.get_first_name())
+      self.danpheEMR.find_element_by_xpath("//input[@value='Update Patient Information']").click()
+      time.sleep(2)
+      # History
+      self.danpheEMR.find_element_by_xpath("//*[@id='myGrid']/div/div[1]/div/div[3]/div[2]/div/div/div[1]/div[6]/a[2]").click()
+
+
+
+
+
+
+
 
 
 
