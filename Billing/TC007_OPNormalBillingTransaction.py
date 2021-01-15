@@ -9,3 +9,4 @@ NBT.quickAppointment()
 NBT.OPnormalbillingtransaction("X-Ray Chest PA view","Urine Calcium")
 NBT.logout()
 NBT.closeBrowser()
+#initial billing ended
