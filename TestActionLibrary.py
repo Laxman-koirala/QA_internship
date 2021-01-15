@@ -85,8 +85,9 @@ class A:
 
    def counteractivation(self):
       print(">>Activate Billing Counter: START")
-      self.danpheEMR.find_element_by_link_text("Billing").click()
       time.sleep(2)
+      self.danpheEMR.find_element_by_link_text("Billing").click()
+      time.sleep(4)
       self.danpheEMR.find_element_by_css_selector("my-app > div > ul > li:nth-child(6) > a").click()
       time.sleep(2)
       self.danpheEMR.find_element_by_css_selector(".col-md-2:nth-child(1) img").click()
@@ -187,6 +188,8 @@ class A:
 
 
    def verificationOfAppointmentInvoice(self):
+      global invoiceNo
+      global TotalAmountInvoice
       print(">>Verify of Appointment Invoice Details: START")
       time.sleep(5)
 
@@ -196,6 +199,11 @@ class A:
       HospitalNo = self.danpheEMR.find_element_by_xpath(
          "//strong[contains(text(), 'Hospital No:')]/parent::p/child::span/child::strong").text
 
+      TotalInvoiceAmount = str(self.danpheEMR.find_element_by_css_selector(
+         "div:nth-child(9)>div:nth-child(2)>table>tbody>tr:nth-child(3)>td:nth-child(2)").text)
+
+
+      TotalAmountInvoice = int(float((TotalInvoiceAmount)))
       invoice_contactno = invoice_contactno.partition("No: ")[2]
       invoiceNo = invoiceNoTemp.partition("BL")[2]
       recent_contact = []
@@ -210,6 +218,7 @@ class A:
          print("InvoiceNoTemp: ", invoiceNoTemp)
          print("InvoiceNo: ", invoiceNo)
          print("HospitalNo: ", HospitalNo)
+         print("TotalAmountInvoice",TotalAmountInvoice)
          print("Verification of Appointment Invoice Details: END||OPD<<")
 
 
@@ -388,6 +397,151 @@ class A:
       # History
       self.danpheEMR.find_element_by_xpath("//*[@id='myGrid']/div/div[1]/div/div[3]/div[2]/div/div/div[1]/div[6]/a[2]").click()
 
+   def OPnormalbillingtransaction(self,itemName1,itemName2,*args):
+      global NormalBillingSN1Total
+      global NormalBillingSN2Total
+
+       # Outpatient Normal billing
+
+      print(">>Create OP billing Invoice: {} and {} Items: START".format(itemName1,itemName2))
+      self.danpheEMR.find_element_by_link_text("Billing").click()
+      time.sleep(1)
+      self.danpheEMR.find_element_by_id("quickFilterInput").click()
+      time.sleep(1)
+      self.danpheEMR.find_element_by_id("quickFilterInput").send_keys(ContactNo)
+      self.danpheEMR.find_element_by_id("quickFilterInput").send_keys(Keys.RETURN)
+
+      self.danpheEMR.find_element_by_link_text("Billing Request").click()
+
+      # OUTPATIENT BILLING page
+      time.sleep(2)
+      scheme = self.danpheEMR.find_element_by_css_selector("div>div>div>div>select")
+      time.sleep(1)
+      drp = Select(scheme)
+      time.sleep(1)
+      drp.select_by_index(4)
+      time.sleep(1)
+      self.danpheEMR.find_element_by_id("items-box0").click()
+      self.danpheEMR.find_element_by_id("items-box0").send_keys(itemName1)
+      time.sleep(1)
+      self.danpheEMR.find_element_by_id("items-box0").send_keys(Keys.TAB)
+      time.sleep(2)
+      self.danpheEMR.find_element_by_css_selector("td:nth-child(5)>form>div>input").send_keys(Doctor)
+      NormalBillingSN1Total = self.danpheEMR.find_element_by_xpath("//input[@name='total']").get_attribute('value')
+      time.sleep(1)
+      self.danpheEMR.find_element_by_css_selector("a > .btn-success").click()
+      time.sleep(1)
+      self.danpheEMR.find_element_by_id("items-box1").send_keys(itemName2)
+      time.sleep(2)
+      self.danpheEMR.find_element_by_id("items-box1").send_keys(Keys.TAB)
+      time.sleep(2)
+      self.danpheEMR.find_element_by_xpath("(//input[@onclick='this.select();'])[9]").send_keys(Doctor)
+      time.sleep(1)
+      NormalBillingSN2Total = self.danpheEMR.find_element_by_xpath("(//input[@name='total'])[2]").get_attribute('value')
+      time.sleep(1)
+
+      #This is for provisional slip
+      if args:
+         self.danpheEMR.find_element_by_css_selector("button.btn.creamyblue.btn-success").click()
+      else:
+      # Regular for bill Verification
+          self.danpheEMR.find_element_by_xpath("//input[@value='Print INVOICE']").click()
+          time.sleep(3)
+          print("Create OP billing Invoice: {} and {} Items:end<<<<".format(itemName1, itemName2))
+
+
+
+   def VerifivationOfNormalBilling(self):
+      global TIA
+      print(">>>>>Verification of NormalBilling Invoice Details: Start||OP")
+      time.sleep(2)
+      PhoneNumberText = str(self.danpheEMR.find_element_by_css_selector("#printpage>div>div:nth-child(6)>div:nth-child(5)>div.left").text)
+      invoice_contactno = PhoneNumberText.partition("No: ")[2]
+      time.sleep(1)
+      TotalInvoiceAmount = str(self.danpheEMR.find_element_by_css_selector("div:nth-child(9)>div:nth-child(2)>table>tbody>tr:nth-child(3)>td:nth-child(2)").text)
+
+      TotalBillingAmount = int(NormalBillingSN1Total) + int(NormalBillingSN2Total)
+      TIA = int(float((TotalInvoiceAmount.replace(',', ''))))
+
+      try:
+         assert int(TotalBillingAmount) == int(TIA)
+         assert int(invoice_contactno) == int(ContactNo)
+      except:
+         print("Telephone number or Contact num isn't coordinate/match || Additional bug")
+
+      finally:
+         print("TotalInvoiceAmount: ", TIA)
+         print("TotalAmountduringbilling: ", TotalBillingAmount)
+         print("InvoicePhoneNo: ", invoice_contactno)
+         print("realContactNum: ",ContactNo)
+         print("Verification of NormalBilling Invoice Details: END||OP<<<<")
+
+   def provisionalItemBilling(self):
+      print(">>>>>>>>Provisional Item Billing start;")
+      time.sleep(2)
+      self.danpheEMR.find_element_by_css_selector("my-app > div > ul > li:nth-child(5) > a").click()
+      time.sleep(2)
+      self.danpheEMR.find_element_by_xpath("//*[@id='myGrid']/div/div[1]/div/div[3]/div[1]/div[1]/div[7]/a[1]").click()
+      time.sleep(2)
+      self.danpheEMR.find_element_by_css_selector("div.col-md-3 > div:nth-child(1) > div > div > input").click()
+      time.sleep(2)
+      self.danpheEMR.find_element_by_css_selector("ng-component > div > div:nth-child(3) > div > div > input").click()
+      print("Provisional Item Billing end;<<<<<<<<<<<")
+
+   def returnbill(self):
+      print(">>>>>>>>RETURN BILL start;")
+      time.sleep(2)
+      self.danpheEMR.find_element_by_css_selector("my-app > div > ul > li:nth-child(7) > a").click()
+      time.sleep(2)
+      self.danpheEMR.find_element_by_css_selector("tbody > tr > td:nth-child(2) > input").send_keys(invoiceNo)
+      time.sleep(2)
+      self.danpheEMR.find_element_by_css_selector("td:nth-child(3) > button").click()
+      time.sleep(2)
+      self.danpheEMR.find_element_by_css_selector("div:nth-child(3) > div > div > input").click()
+      time.sleep(2)
+      self.danpheEMR.find_element_by_css_selector("div:nth-child(2)> textarea").send_keys('stuff fault')
+      time.sleep(2)
+      self.danpheEMR.find_element_by_css_selector("div:nth-child(3)>div>div:nth-child(2)>button").click()
+      print("RETURN BILL end;<<<<<<<<<<<")
+
+   def Settlement(self):
+      print(">>>>>>> Settlement start")
+      time.sleep(1)
+      self.danpheEMR.find_element_by_link_text("Billing").click()
+      time.sleep(2)
+      self.danpheEMR.find_element_by_css_selector("my-app>div>ul>li:nth-child(10)>a").click()
+      time.sleep(2)
+      self.danpheEMR.find_element_by_xpath("//*[@id='myGrid']/div/div[1]/div/div[3]/div[2]/div/div/div[1]/div[9]/a").click()
+      time.sleep(2)
+      self.danpheEMR.find_element_by_css_selector(".col-md-offset-4.col-sm-6>div:nth-child(2)>div.col-md-12>input").click()
+      time.sleep(2)
+      print("Settlement end;<<<<<<<<<<<")
+
+   def duplicationinvoiceverification(self):
+      print(">>>>>Duplication invoice verification: Start")
+      time.sleep(1)
+      self.danpheEMR.find_element_by_link_text("Billing").click()
+      time.sleep(2)
+      self.danpheEMR.find_element_by_css_selector("my-app>div>ul>li:nth-child(9)>a").click()
+      time.sleep(2)
+      self.danpheEMR.find_element_by_xpath(
+         "//*[@id='myGrid']/div/div[1]/div/div[3]/div[2]/div/div/div[1]/div[8]/a").click()
+      time.sleep(2)
+      TotalAmountDuplication = int(float(str(self.danpheEMR.find_element_by_css_selector(
+         "div:nth-child(9)>div:nth-child(2)>table>tbody>tr:nth-child(3)>td:nth-child(2)").text)))
+      time.sleep(2)
+      TotalAmountOriginal = TotalAmountInvoice
+      try:
+         assert int(TotalAmountDuplication) == int(TotalAmountOriginal)
+      except:
+         print("Duplication fail || Additional bug")
+
+      print("TotalInvoiceAmount in original: ", TotalAmountOriginal)
+      print("TotalinvoiceAmount in duplication: ", TotalAmountDuplication)
+
+
+
+      print("Duplication invoice verification: End<<<<<<<<")
 
 
 
